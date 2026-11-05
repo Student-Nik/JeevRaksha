@@ -10,15 +10,16 @@ import {
   CheckCircle,
   Clock,
   Heart,
-  MapPin,
   PawPrint,
-  Phone,
   Stethoscope,
   User,
 } from "lucide-react";
 
+// Backend API URL
+const API_URL = "http://localhost:5000/api/v1/appointments";
+
 // Generate appointment time slots in 12-hour AM/PM format.
-// Stored values remain in HH:mm format for backend compatibility.
+// Backend receives time in HH:mm format.
 const timeOptions = Array.from({ length: 48 }, (_, index) => {
   const totalMinutes = index * 30;
   const hour24 = Math.floor(totalMinutes / 60);
@@ -39,6 +40,7 @@ const timeOptions = Array.from({ length: 48 }, (_, index) => {
   return { value, label };
 });
 
+// Get today's date in YYYY-MM-DD format.
 function getTodayDate() {
   const today = new Date();
 
@@ -62,8 +64,11 @@ function BookAppointment() {
     message: "",
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
+  // Handle input changes.
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -73,19 +78,71 @@ function BookAppointment() {
     }));
 
     setIsSubmitted(false);
+    setErrorMessage("");
   };
 
-  const handleSubmit = (e) => {
+  // Submit appointment request to backend.
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!/^[0-9]{10}$/.test(formData.phone)) {
-      alert("कृपया योग्य १० अंकी मोबाईल नंबर टाका.");
+      setErrorMessage("कृपया योग्य १० अंकी मोबाईल नंबर टाका.");
       return;
     }
 
-    setIsSubmitted(true);
+    try {
+      setIsLoading(true);
+      setIsSubmitted(false);
+      setErrorMessage("");
 
-    // Demo only: This form does not yet save data to a backend.
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "अपॉइंटमेंट बुक करता आली नाही."
+        );
+      }
+
+      // Appointment successfully saved.
+      setIsSubmitted(true);
+
+      // Reset form after successful submission.
+      setFormData({
+        ownerName: "",
+        phone: "",
+        animalType: "",
+        animalName: "",
+        service: "",
+        date: "",
+        time: "",
+        address: "",
+        message: "",
+      });
+
+      // Show warning if email notification failed.
+      if (!result.data?.notificationSent) {
+        setErrorMessage(
+          "तुमची अपॉइंटमेंट विनंती जतन झाली आहे. मात्र डॉक्टरांना ईमेल सूचना पाठवता आली नाही."
+        );
+      }
+    } catch (error) {
+      console.error("Appointment booking error:", error);
+
+      setErrorMessage(
+        error.message ||
+          "काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const inputClass =
@@ -110,6 +167,7 @@ function BookAppointment() {
               <h1 className="text-xl font-extrabold tracking-tight">
                 JeevRaksha
               </h1>
+
               <p className="text-xs text-[#B9CEC2]">
                 पशुवैद्यकीय सेवा केंद्र
               </p>
@@ -186,7 +244,10 @@ function BookAppointment() {
                   </div>
 
                   <div>
-                    <h4 className="font-bold">तज्ज्ञ पशुवैद्यकीय सेवा</h4>
+                    <h4 className="font-bold">
+                      तज्ज्ञ पशुवैद्यकीय सेवा
+                    </h4>
+
                     <p className="mt-1 text-sm text-[#B9CEC2]">
                       प्राण्यांच्या आरोग्यासाठी योग्य मार्गदर्शन.
                     </p>
@@ -199,7 +260,10 @@ function BookAppointment() {
                   </div>
 
                   <div>
-                    <h4 className="font-bold">सोयीची वेळ निवडा</h4>
+                    <h4 className="font-bold">
+                      सोयीची वेळ निवडा
+                    </h4>
+
                     <p className="mt-1 text-sm text-[#B9CEC2]">
                       आपल्या सोयीनुसार तारीख आणि वेळ निवडा.
                     </p>
@@ -212,7 +276,10 @@ function BookAppointment() {
                   </div>
 
                   <div>
-                    <h4 className="font-bold">सर्व प्राण्यांसाठी सेवा</h4>
+                    <h4 className="font-bold">
+                      सर्व प्राण्यांसाठी सेवा
+                    </h4>
+
                     <p className="mt-1 text-sm text-[#B9CEC2]">
                       पाळीव प्राणी आणि पशुधनासाठी सेवा.
                     </p>
@@ -479,31 +546,49 @@ function BookAppointment() {
               {/* Success Message */}
               {isSubmitted && (
                 <div className="flex items-start gap-3 rounded-xl border border-[#C7F36B]/30 bg-[#C7F36B]/10 p-4 text-[#C7F36B]">
-                  <CheckCircle size={22} className="mt-0.5 shrink-0" />
+
+                  <CheckCircle
+                    size={22}
+                    className="mt-0.5 shrink-0"
+                  />
 
                   <div>
                     <p className="font-bold">
-                      माहिती यशस्वीरित्या भरली!
+                      अपॉइंटमेंटची विनंती यशस्वीरित्या पाठवली!
                     </p>
 
                     <p className="mt-1 text-sm text-[#B9CEC2]">
-                      ही सध्या डेमो फॉर्म सबमिशनची पुष्टी आहे.
-                      प्रत्यक्ष अपॉइंटमेंट बुकिंगसाठी बॅकएंड जोडणे आवश्यक आहे.
+                      धन्यवाद! तुमची अपॉइंटमेंट विनंती डॉक्टरांना
+                      पाठवण्यात आली आहे. डॉक्टर लवकरच तुमच्याशी
+                      संपर्क साधतील.
                     </p>
                   </div>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {errorMessage && (
+                <div className="rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-300">
+                  {errorMessage}
                 </div>
               )}
 
               {/* Submit Button */}
               <button
                 type="submit"
-                className="group flex w-full items-center justify-center gap-3 rounded-full bg-[#C7F36B] px-7 py-4 font-extrabold text-[#123D32] transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-xl hover:shadow-[#C7F36B]/10"
+                disabled={isLoading}
+                className="group flex w-full items-center justify-center gap-3 rounded-full bg-[#C7F36B] px-7 py-4 font-extrabold text-[#123D32] transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-xl hover:shadow-[#C7F36B]/10 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
               >
-                अपॉइंटमेंटची विनंती पाठवा
-                <ArrowRight
-                  size={20}
-                  className="transition-transform duration-300 group-hover:translate-x-1"
-                />
+                {isLoading
+                  ? "विनंती पाठवत आहे..."
+                  : "अपॉइंटमेंटची विनंती पाठवा"}
+
+                {!isLoading && (
+                  <ArrowRight
+                    size={20}
+                    className="transition-transform duration-300 group-hover:translate-x-1"
+                  />
+                )}
               </button>
 
               <p className="text-center text-xs leading-5 text-[#91AA9D]">

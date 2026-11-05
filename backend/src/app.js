@@ -1,5 +1,8 @@
+
 const express = require("express");
 const cors = require("cors");
+
+const appointmentRoutes = require("./routes/appointmentRoutes");
 
 const app = express();
 
@@ -13,5 +16,8 @@ app.get("/", (req, res) => {
     message: "Welcome to JeevRaksha API"
   });
 });
+
+// Appointment routes
+app.use("/api/v1/appointments", appointmentRoutes);
 
 module.exports = app;
