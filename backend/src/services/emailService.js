@@ -9,9 +9,31 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Convert values into readable names
+// Convert enum values into Marathi
 const formatLabel = (value) => {
-  if (!value) return "Not provided";
+  if (!value) return "माहिती उपलब्ध नाही";
+
+  const translations = {
+    COW: "गाय",
+    BUFFALO: "म्हैस",
+    GOAT: "शेळी",
+    SHEEP: "मेंढी",
+    DOG: "कुत्रा",
+    CAT: "मांजर",
+    OTHER: "इतर",
+
+    GENERAL_CHECKUP: "सामान्य तपासणी",
+    VACCINATION: "लसीकरण",
+    TREATMENT: "उपचार",
+    EMERGENCY: "आपत्कालीन सेवा",
+    ROUTINE_CHECKUP: "नियमित तपासणी",
+    SURGERY: "शस्त्रक्रिया",
+    CONSULTATION: "वैद्यकीय सल्ला"
+  };
+
+  if (translations[value]) {
+    return translations[value];
+  }
 
   return value
     .toLowerCase()
@@ -20,16 +42,16 @@ const formatLabel = (value) => {
     .join(" ");
 };
 
-// Convert 24-hour time to 12-hour format
+// Convert 24-hour time to 12-hour Marathi format
 const formatTime = (time) => {
-  if (!time) return "Not provided";
+  if (!time) return "माहिती उपलब्ध नाही";
 
   const [hours, minutes] = time.split(":");
   const date = new Date();
 
   date.setHours(Number(hours), Number(minutes));
 
-  return date.toLocaleTimeString("en-IN", {
+  return date.toLocaleTimeString("mr-IN", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true
@@ -53,7 +75,7 @@ const sendAppointmentNotification = async (appointment) => {
 
   const html = `
     <!DOCTYPE html>
-    <html>
+    <html lang="mr">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -92,7 +114,7 @@ const sendAppointmentNotification = async (appointment) => {
             color: #C7F36B;
             font-size: 13px;
           ">
-            Service, Care and Health for Every Animal
+            प्रत्येक प्राण्यासाठी सेवा, काळजी आणि आरोग्य
           </p>
         </div>
 
@@ -104,13 +126,13 @@ const sendAppointmentNotification = async (appointment) => {
             margin-top: 0;
             font-size: 22px;
           ">
-            New Appointment Request!
+            नवीन अपॉइंटमेंट विनंती!
           </h2>
 
-          <p style="font-size: 14px; line-height: 1.6;">
-            Hello Doctor,<br><br>
-            A farmer has submitted a new appointment request
-            through the JeevRaksha website. Here are the details:
+          <p style="font-size: 14px; line-height: 1.8;">
+            नमस्कार डॉक्टर,<br><br>
+            JeevRaksha वेबसाइटद्वारे एका शेतकऱ्याने नवीन भेटीची विनंती नोंदवली आहे.
+            त्याचा तपशील खालीलप्रमाणे आहे:
           </p>
 
           <!-- Status -->
@@ -122,80 +144,80 @@ const sendAppointmentNotification = async (appointment) => {
             margin: 20px 0;
           ">
             <strong style="color: #946200;">
-              Appointment Status: PENDING
+              अपॉइंटमेंटची स्थिती: प्रलंबित
             </strong>
           </div>
 
           <!-- Farmer Details -->
           <h3 style="color: #123D32; font-size: 17px;">
-            👤 Farmer Details
+            👤 शेतकऱ्याची माहिती
           </h3>
 
           <table width="100%" cellpadding="9"
             style="border-collapse: collapse; font-size: 14px;">
 
             <tr style="background-color: #f4f8f5;">
-              <td><strong>Owner Name</strong></td>
+              <td><strong>मालकाचे नाव</strong></td>
               <td>${escapeHtml(appointment.ownerName)}</td>
             </tr>
 
             <tr>
-              <td><strong>Phone</strong></td>
+              <td><strong>मोबाईल क्रमांक</strong></td>
               <td>${escapeHtml(appointment.phone)}</td>
             </tr>
 
             <tr style="background-color: #f4f8f5;">
-              <td><strong>Address</strong></td>
+              <td><strong>पत्ता</strong></td>
               <td>${escapeHtml(appointment.address)}</td>
             </tr>
           </table>
 
           <!-- Animal Details -->
           <h3 style="color: #123D32; font-size: 17px; margin-top: 25px;">
-            🐄 Animal Details
+            🐄 प्राण्याची माहिती
           </h3>
 
           <table width="100%" cellpadding="9"
             style="border-collapse: collapse; font-size: 14px;">
 
             <tr style="background-color: #f4f8f5;">
-              <td><strong>Animal Type</strong></td>
+              <td><strong>प्राण्याचा प्रकार</strong></td>
               <td>${escapeHtml(animalType)}</td>
             </tr>
 
             <tr>
-              <td><strong>Animal Name</strong></td>
-              <td>${escapeHtml(appointment.animalName || "Not provided")}</td>
+              <td><strong>प्राण्याचे नाव</strong></td>
+              <td>${escapeHtml(appointment.animalName || "माहिती उपलब्ध नाही")}</td>
             </tr>
           </table>
 
           <!-- Appointment Details -->
           <h3 style="color: #123D32; font-size: 17px; margin-top: 25px;">
-            📅 Appointment Details
+            📅 अपॉइंटमेंटचा तपशील
           </h3>
 
           <table width="100%" cellpadding="9"
             style="border-collapse: collapse; font-size: 14px;">
 
             <tr style="background-color: #f4f8f5;">
-              <td><strong>Service</strong></td>
+              <td><strong>सेवा</strong></td>
               <td>${escapeHtml(service)}</td>
             </tr>
 
             <tr>
-              <td><strong>Date</strong></td>
+              <td><strong>तारीख</strong></td>
               <td>${escapeHtml(appointment.date)}</td>
             </tr>
 
             <tr style="background-color: #f4f8f5;">
-              <td><strong>Time</strong></td>
+              <td><strong>वेळ</strong></td>
               <td>${escapeHtml(time)}</td>
             </tr>
           </table>
 
           <!-- Message -->
           <h3 style="color: #123D32; font-size: 17px; margin-top: 25px;">
-            💬 Additional Message
+            💬 अतिरिक्त संदेश
           </h3>
 
           <div style="
@@ -203,18 +225,18 @@ const sendAppointmentNotification = async (appointment) => {
             padding: 14px;
             border-radius: 8px;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.8;
           ">
-            ${escapeHtml(appointment.message || "No additional message provided.")}
+            ${escapeHtml(appointment.message || "कोणताही अतिरिक्त संदेश दिलेला नाही.")}
           </div>
 
           <p style="
             margin-top: 25px;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.8;
           ">
-            Please review this request and contact the farmer
-            to confirm the appointment.
+            कृपया या विनंतीची तपासणी करून शेतकऱ्याशी संपर्क साधा
+            आणि अपॉइंटमेंट निश्चित करा.
           </p>
 
         </div>
@@ -233,7 +255,7 @@ const sendAppointmentNotification = async (appointment) => {
             font-size: 12px;
             margin-bottom: 0;
           ">
-            Service, Care and Health for Every Animal.
+            प्रत्येक प्राण्यासाठी सेवा, काळजी आणि आरोग्य.
           </p>
         </div>
 
@@ -245,7 +267,7 @@ const sendAppointmentNotification = async (appointment) => {
   const mailOptions = {
     from: `"JeevRaksha" <${process.env.EMAIL_USER}>`,
     to: process.env.DOCTOR_EMAIL,
-    subject: `New Appointment Request - ${appointment.ownerName}`,
+    subject: `नवीन अपॉइंटमेंट विनंती - ${appointment.ownerName}`,
     html
   };
 

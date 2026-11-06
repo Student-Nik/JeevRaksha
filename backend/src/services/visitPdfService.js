@@ -1,9 +1,15 @@
 
 const PDFDocument = require("pdfkit");
+const path = require("path");
 
 const generateVisitPdf = (visit) => {
   return new Promise((resolve, reject) => {
     try {
+      const fontPath = path.join(
+        __dirname,
+        "../../fonts/NotoSansDevanagari-Regular.ttf"
+      );
+
       const doc = new PDFDocument({
         size: "A4",
         margins: {
@@ -17,44 +23,71 @@ const generateVisitPdf = (visit) => {
 
       const chunks = [];
 
-      doc.on("data", (chunk) => {
-        chunks.push(chunk);
-      });
-
-      doc.on("end", () => {
-        resolve(Buffer.concat(chunks));
-      });
-
-      doc.on("error", (error) => {
-        reject(error);
-      });
+      doc.on("data", (chunk) => chunks.push(chunk));
+      doc.on("end", () => resolve(Buffer.concat(chunks)));
+      doc.on("error", reject);
 
       const green = "#123D32";
-      const lightGreen = "#E4F0E5";
       const accent = "#C7F36B";
       const pageWidth = 495;
 
+      // Marathi-compatible font
+      const FONT = fontPath;
+
       const value = (item) => {
         if (item === undefined || item === null || item === "") {
-          return "Not provided";
+          return "माहिती उपलब्ध नाही";
         }
 
         return String(item);
+      };
+
+      // Translate fixed values stored in the database
+      const translations = {
+        COW: "गाय",
+        BUFFALO: "म्हैस",
+        GOAT: "शेळी",
+        SHEEP: "मेंढी",
+        DOG: "कुत्रा",
+        CAT: "मांजर",
+        OTHER: "इतर",
+
+        MALE: "नर",
+        FEMALE: "मादी",
+        UNKNOWN: "माहित नाही",
+
+        FIRST_VISIT: "पहिली भेट",
+        FOLLOW_UP: "पुनर्तपासणी",
+        EMERGENCY: "आपत्कालीन भेट",
+        ROUTINE: "नियमित तपासणी",
+
+        GOOD: "चांगली",
+        STABLE: "स्थिर",
+        MODERATE: "मध्यम",
+        CRITICAL: "गंभीर"
+      };
+
+      const translatedValue = (item) => {
+        if (item === undefined || item === null || item === "") {
+          return "माहिती उपलब्ध नाही";
+        }
+
+        return translations[item] || String(item);
       };
 
       const section = (heading) => {
         doc.moveDown(0.8);
 
         doc
+          .font(FONT)
+          .fontSize(13)
           .fillColor(green)
-          .font("Helvetica-Bold")
-          .fontSize(12)
-          .text(heading.toUpperCase());
+          .text(heading);
 
         doc
           .moveTo(50, doc.y + 5)
           .lineTo(545, doc.y + 5)
-          .strokeColor("#C7F36B")
+          .strokeColor(accent)
           .lineWidth(2)
           .stroke();
 
@@ -63,14 +96,14 @@ const generateVisitPdf = (visit) => {
 
       const field = (label, data) => {
         doc
-          .font("Helvetica-Bold")
-          .fontSize(9)
+          .font(FONT)
+          .fontSize(10)
           .fillColor("#555555")
           .text(label);
 
         doc
-          .font("Helvetica")
-          .fontSize(10)
+          .font(FONT)
+          .fontSize(11)
           .fillColor("#222222")
           .text(value(data), {
             width: pageWidth
@@ -79,138 +112,146 @@ const generateVisitPdf = (visit) => {
         doc.moveDown(0.5);
       };
 
+      const translatedField = (label, data) => {
+        field(label, translatedValue(data));
+      };
+
       // HEADER
       doc
         .rect(0, 0, 595.28, 125)
         .fill(green);
 
       doc
-        .fillColor(accent)
-        .font("Helvetica-Bold")
+        .font(FONT)
         .fontSize(25)
+        .fillColor(accent)
         .text("JeevRaksha", 50, 35);
 
       doc
+        .font(FONT)
+        .fontSize(11)
         .fillColor("#FFFFFF")
-        .font("Helvetica")
-        .fontSize(10)
-        .text("Service, Care and Health for Every Animal", 50, 70);
+        .text("प्रत्येक प्राण्यासाठी सेवा, काळजी आणि आरोग्य", 50, 70);
 
       doc
+        .font(FONT)
+        .fontSize(15)
         .fillColor("#FFFFFF")
-        .font("Helvetica-Bold")
-        .fontSize(13)
-        .text("VETERINARY VISIT REPORT", 50, 95);
+        .text("पशुवैद्यकीय भेट अहवाल", 50, 95);
 
       doc.y = 145;
 
       // REPORT INFORMATION
       doc
-        .font("Helvetica")
+        .font(FONT)
         .fontSize(9)
         .fillColor("#666666")
-        .text(`Report Generated: ${new Date().toLocaleString("en-IN")}`);
+        .text(
+          `अहवाल तयार केल्याची तारीख: ${new Date().toLocaleString("mr-IN")}`
+        );
 
-      doc.text(`Visit ID: ${visit._id}`);
+      doc.text(`भेट क्रमांक: ${visit._id}`);
 
       // FARMER DETAILS
-      section("Farmer Details");
+      section("१. शेतकऱ्याची माहिती");
 
-      field("Farmer Name", visit.farmerName);
-      field("Phone Number", visit.phone);
-      field("Email Address", visit.email);
-      field("Address", visit.address);
+      field("शेतकऱ्याचे नाव", visit.farmerName);
+      field("मोबाईल क्रमांक", visit.phone);
+      field("ई-मेल पत्ता", visit.email);
+      field("पत्ता", visit.address);
 
       // ANIMAL DETAILS
-      section("Animal Details");
+      section("२. प्राण्याची माहिती");
 
-      field("Animal Type", visit.animalType);
-      field("Animal Name", visit.animalName);
-      field("Tag ID", visit.tagId);
-      field("Breed", visit.breed);
-      field("Age", visit.age);
-      field("Gender", visit.gender);
-      field("Weight", visit.weight);
+      translatedField("प्राण्याचा प्रकार", visit.animalType);
+      field("प्राण्याचे नाव", visit.animalName);
+      field("टॅग क्रमांक", visit.tagId);
+      field("जात / प्रजाती", visit.breed);
+      field("वय", visit.age);
+      translatedField("लिंग", visit.gender);
+      field("वजन", visit.weight);
 
       // VISIT DETAILS
-      section("Visit Details");
+      section("३. भेटीचा तपशील");
 
-      field("Visit Date", visit.visitDate);
-      field("Visit Time", visit.visitTime);
-      field("Visit Type", visit.visitType);
-      field("Chief Complaint", visit.chiefComplaint);
-      field("Symptoms", visit.symptoms);
-      field("Illness Duration", visit.illnessDuration);
-      field("Previous Medical History", visit.previousHistory);
+      field("भेटीची तारीख", visit.visitDate);
+      field("भेटीची वेळ", visit.visitTime);
+      translatedField("भेटीचा प्रकार", visit.visitType);
+      field("मुख्य तक्रार", visit.chiefComplaint);
+      field("लक्षणे", visit.symptoms);
+      field("आजाराचा कालावधी", visit.illnessDuration);
+      field("मागील वैद्यकीय इतिहास", visit.previousHistory);
 
       // CLINICAL EXAMINATION
-      section("Clinical Examination");
+      section("४. वैद्यकीय तपासणी");
 
-      field("Temperature", visit.temperature);
-      field("Heart Rate", visit.heartRate);
-      field("Respiratory Rate", visit.respiratoryRate);
-      field("General Condition", visit.generalCondition);
-      field("Physical Examination", visit.physicalExamination);
-      field("Clinical Observations", visit.clinicalObservations);
+      field("शरीराचे तापमान", visit.temperature);
+      field("हृदयाचे ठोके", visit.heartRate);
+      field("श्वसनाचा दर", visit.respiratoryRate);
+      translatedField("प्राण्याची सामान्य स्थिती", visit.generalCondition);
+      field("शारीरिक तपासणी", visit.physicalExamination);
+      field("वैद्यकीय निरीक्षणे", visit.clinicalObservations);
 
       // DIAGNOSIS AND TREATMENT
-      section("Diagnosis and Treatment");
+      section("५. निदान आणि उपचार");
 
-      field("Diagnosis", visit.diagnosis);
-      field("Suspected Disease", visit.suspectedDisease);
-      field("Treatment", visit.treatment);
-      field("Procedures", visit.procedures);
-      field("Laboratory Tests", visit.laboratoryTests);
-      field("Doctor Notes", visit.doctorNotes);
+      field("निदान", visit.diagnosis);
+      field("संशयित आजार", visit.suspectedDisease);
+      field("उपचार", visit.treatment);
+      field("वैद्यकीय प्रक्रिया", visit.procedures);
+      field("प्रयोगशाळा चाचण्या", visit.laboratoryTests);
+      field("डॉक्टरांच्या नोंदी", visit.doctorNotes);
 
       // MEDICINES
-      section("Prescribed Medicines");
+      section("६. निर्धारित औषधे");
 
       if (visit.medicines && visit.medicines.length > 0) {
         visit.medicines.forEach((medicine, index) => {
           doc
-            .font("Helvetica-Bold")
-            .fontSize(10)
+            .font(FONT)
+            .fontSize(11)
             .fillColor(green)
-            .text(`Medicine ${index + 1}`);
+            .text(`औषध क्रमांक ${index + 1}`);
 
-          field("Medicine Name", medicine.name);
-          field("Dosage", medicine.dosage);
-          field("Route", medicine.route);
-          field("Frequency", medicine.frequency);
-          field("Duration", medicine.duration);
-          field("Instructions", medicine.instructions);
+          field("औषधाचे नाव", medicine.name);
+          field("औषधाचे प्रमाण", medicine.dosage);
+          field("औषध देण्याची पद्धत", medicine.route);
+          field("औषध घेण्याची वारंवारता", medicine.frequency);
+          field("उपचाराचा कालावधी", medicine.duration);
+          field("विशेष सूचना", medicine.instructions);
         });
       } else {
-        field("Medicines", "No medicines prescribed.");
+        field("औषधे", "कोणतीही औषधे निर्धारित केलेली नाहीत.");
       }
 
-      // FOLLOW-UP AND ADVICE
-      section("Follow-up and Care Instructions");
+      // FOLLOW-UP AND CARE INSTRUCTIONS
+      section("७. पुढील तपासणी आणि काळजी");
 
-      field("Follow-up Date", visit.followUpDate);
-      field("Home Care", visit.homeCare);
-      field("Dietary Advice", visit.dietaryAdvice);
-      field("Additional Remarks", visit.remarks);
+      field("पुढील तपासणीची तारीख", visit.followUpDate);
+      field("घरगुती काळजी", visit.homeCare);
+      field("आहारविषयक सल्ला", visit.dietaryAdvice);
+      field("अतिरिक्त सूचना", visit.remarks);
 
       // DOCTOR DETAILS
-      section("Doctor Details");
+      section("८. डॉक्टरांची माहिती");
 
-      field("Doctor Name", visit.doctorName);
+      field("डॉक्टरांचे नाव", visit.doctorName);
 
       doc.moveDown(2);
 
       doc
+        .font(FONT)
+        .fontSize(12)
         .fillColor(green)
-        .font("Helvetica-Bold")
-        .fontSize(10)
-        .text("Thank you for trusting JeevRaksha!");
+        .text("JeevRaksha वर विश्वास ठेवल्याबद्दल धन्यवाद!");
 
       doc
-        .font("Helvetica")
-        .fontSize(8)
+        .font(FONT)
+        .fontSize(9)
         .fillColor("#666666")
-        .text("This report contains the veterinary visit details recorded by the doctor.");
+        .text(
+          "या अहवालामध्ये डॉक्टरांनी नोंदविलेल्या पशुवैद्यकीय भेटीचा तपशील दिलेला आहे."
+        );
 
       // FOOTER
       const pages = doc.bufferedPageRange();
@@ -219,11 +260,11 @@ const generateVisitPdf = (visit) => {
         doc.switchToPage(pages.start + i);
 
         doc
-          .font("Helvetica")
+          .font(FONT)
           .fontSize(8)
           .fillColor("#888888")
           .text(
-            `JeevRaksha | Confidential Veterinary Report | Page ${i + 1} of ${pages.count}`,
+            `JeevRaksha | गोपनीय पशुवैद्यकीय अहवाल | पृष्ठ ${i + 1} पैकी ${pages.count}`,
             50,
             780,
             {
