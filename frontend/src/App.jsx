@@ -12,6 +12,7 @@ import BookAppointment from "./components/BookAppointment";
 import DoctorVisitForm from "./components/DoctorVisitForm";
 import DoctorLogin from "./components/DoctorLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Developer from "./components/Developer"
 
 function Home() {
   return (
@@ -31,6 +32,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Pages */}
         <Route path="/" element={<Home />} />
 
         <Route
@@ -39,10 +41,17 @@ function App() {
         />
 
         <Route
+          path="/developer"
+          element={<Developer />}
+        />
+
+        {/* Doctor Login */}
+        <Route
           path="/doctor/login"
           element={<DoctorLogin />}
         />
 
+        {/* Protected Doctor Pages */}
         <Route element={<ProtectedRoute />}>
           <Route
             path="/doctor/visits/new"

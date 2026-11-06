@@ -1,12 +1,15 @@
+
 import {
   MapPin,
   Phone,
   Mail,
   Clock,
-  ArrowUpRight,
   PawPrint,
   Heart,
+  ArrowUpRight,
 } from "lucide-react";
+
+import { Link } from "react-router-dom";
 
 function Contact() {
   return (
@@ -53,7 +56,7 @@ function Contact() {
 
               <p className="mt-3 text-sm leading-7 text-[#B9CEC2]">
                 ढवळपुरी परिसर
-                <br></br>
+                <br />
                 We provide all healthcare services around Dhawalpuri.
               </p>
             </div>
@@ -121,8 +124,6 @@ function Contact() {
               </p>
             </div>
 
-           
-
           </div>
         </div>
       </section>
@@ -170,25 +171,40 @@ function Contact() {
                     मुख्यपृष्ठ
                   </a>
                 </li>
+
                 <li>
                   <a href="#about" className="hover:text-[#C7F36B] transition">
                     आमच्याबद्दल
                   </a>
                 </li>
+
                 <li>
                   <a href="#services" className="hover:text-[#C7F36B] transition">
                     आमच्या सेवा
                   </a>
                 </li>
+
                 <li>
                   <a href="#animals" className="hover:text-[#C7F36B] transition">
                     आम्ही उपचार करतो
                   </a>
                 </li>
+
                 <li>
                   <a href="#appointment" className="hover:text-[#C7F36B] transition">
                     अपॉइंटमेंट
                   </a>
+                </li>
+
+                {/* Developer Profile Link */}
+                <li>
+                  <Link
+                    to="/developer"
+                    className="inline-flex items-center gap-2 font-semibold text-[#C7F36B] transition hover:text-white"
+                  >
+                    डेव्हलपरला जाणून घ्या
+                    <ArrowUpRight size={16} />
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -232,32 +248,32 @@ function Contact() {
                 </li>
 
                 <li className="flex items-center gap-3">
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="19"
-    height="19"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="text-[#C7F36B] shrink-0"
-  >
-    <rect width="20" height="20" x="2" y="2" rx="5" />
-    <circle cx="12" cy="12" r="4" />
-    <circle cx="18" cy="6" r="1" fill="currentColor" stroke="none" />
-  </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="19"
+                    height="19"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-[#C7F36B] shrink-0"
+                  >
+                    <rect width="20" height="20" x="2" y="2" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="18" cy="6" r="1" fill="currentColor" stroke="none" />
+                  </svg>
 
-  <a
-    href="https://www.instagram.com/nilesh_kute_nk/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="hover:text-[#C7F36B] transition-colors"
-  >
-    Instagram
-  </a>
-</li>
+                  <a
+                    href="https://www.instagram.com/nilesh_kute_nk/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#C7F36B] transition-colors"
+                  >
+                    Instagram
+                  </a>
+                </li>
 
               </ul>
             </div>
