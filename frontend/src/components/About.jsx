@@ -36,7 +36,7 @@ function About() {
 
               <div>
                 <h3 className="font-bold text-[#123D32]">
-                  Dr. निलेश कुटे
+                  डॉ. निलेश कुटे
                 </h3>
                 <p className="text-sm text-[#71877A] mt-1">
                   पशुवैद्यकीय तज्ज्ञ

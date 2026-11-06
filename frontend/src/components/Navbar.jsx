@@ -49,6 +49,14 @@ function Navbar() {
               {link.name}
             </a>
           ))}
+
+          {/* Doctor Login */}
+          <Link
+            to="/doctor/login"
+            className="text-sm font-medium text-[#B9CEC2] hover:text-[#C7F36B] transition-colors"
+          >
+            डॉ. लॉगिन
+          </Link>
         </div>
 
         {/* Desktop Appointment Button */}
@@ -75,7 +83,6 @@ function Navbar() {
       {isOpen && (
         <div className="lg:hidden bg-[#0B2B24] border-t border-white/10 px-6 py-6">
           <div className="flex flex-col gap-5">
-
             {navLinks.map((link) => (
               <a
                 key={link.name}
@@ -87,6 +94,15 @@ function Navbar() {
               </a>
             ))}
 
+            {/* Mobile Doctor Login */}
+            <Link
+              to="/doctor/login"
+              onClick={() => setIsOpen(false)}
+              className="text-[#B9CEC2] hover:text-[#C7F36B] font-medium"
+            >
+              डॉ. लॉगिन
+            </Link>
+
             {/* Mobile Appointment Button */}
             <Link
               to="/book-appointment"
@@ -96,7 +112,6 @@ function Navbar() {
               अपॉइंटमेंट बुक करा
               <ArrowUpRight size={18} />
             </Link>
-
           </div>
         </div>
       )}

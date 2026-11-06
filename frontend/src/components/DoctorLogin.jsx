@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 import {
   PawPrint,
   Stethoscope,
@@ -14,7 +15,11 @@ import {
   Activity,
 } from "lucide-react";
 
+const API_URL = "http://localhost:5000/api/v1/auth/doctor/login";
+
 function DoctorLogin() {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -30,10 +35,47 @@ function DoctorLogin() {
       return;
     }
 
-    // Backend login API will be connected here.
-    // Do not verify credentials in the frontend.
+    try {
+      setLoading(true);
 
-    setError("लॉगिन API अजून जोडलेली नाही. कृपया backend जोडल्यावर पुन्हा प्रयत्न करा.");
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setError(
+          result.message || "युजरनेम किंवा पासवर्ड चुकीचा आहे."
+        );
+        return;
+      }
+
+      // Save JWT token
+      localStorage.setItem("doctorToken", result.data.token);
+
+      // Save doctor username
+      localStorage.setItem("doctorUsername", result.data.username);
+
+      // Redirect after successful login
+      navigate("/doctor/visits/new");
+
+    } catch (error) {
+      console.error("Doctor login error:", error);
+
+      setError(
+        "सर्व्हरशी संपर्क साधता आला नाही. कृपया पुन्हा प्रयत्न करा."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,6 +83,7 @@ function DoctorLogin() {
 
       {/* Background Decorations */}
       <div className="pointer-events-none absolute -left-40 -top-40 h-[450px] w-[450px] rounded-full bg-[#1B5948]/30 blur-[100px]" />
+
       <div className="pointer-events-none absolute -bottom-40 -right-40 h-[450px] w-[450px] rounded-full bg-[#C7F36B]/10 blur-[100px]" />
 
       {/* Header */}
@@ -179,7 +222,10 @@ function DoctorLogin() {
                     <input
                       type="text"
                       value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={(e) => {
+                        setUsername(e.target.value);
+                        setError("");
+                      }}
                       placeholder="आपले युजरनेम टाका"
                       autoComplete="username"
                       className="w-full rounded-xl border border-white/10 bg-[#0B2B24] py-4 pl-12 pr-4 text-white outline-none transition placeholder:text-[#718D80] focus:border-[#C7F36B] focus:ring-2 focus:ring-[#C7F36B]/10"
@@ -202,7 +248,10 @@ function DoctorLogin() {
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setError("");
+                      }}
                       placeholder="आपला पासवर्ड टाका"
                       autoComplete="current-password"
                       className="w-full rounded-xl border border-white/10 bg-[#0B2B24] py-4 pl-12 pr-12 text-white outline-none transition placeholder:text-[#718D80] focus:border-[#C7F36B] focus:ring-2 focus:ring-[#C7F36B]/10"
@@ -237,6 +286,7 @@ function DoctorLogin() {
                   className="group flex w-full items-center justify-center gap-3 rounded-xl bg-[#C7F36B] py-4 font-extrabold text-[#123D32] shadow-lg shadow-[#C7F36B]/10 transition-all duration-300 hover:-translate-y-1 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? "लॉगिन सुरू आहे..." : "सुरक्षित लॉगिन करा"}
+
                   <ArrowRight
                     size={20}
                     className="transition-transform duration-300 group-hover:translate-x-1"
