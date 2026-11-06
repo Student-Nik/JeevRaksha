@@ -15,7 +15,9 @@ import {
 } from "lucide-react";
 
 // Backend API URL
-const API_URL = "http://localhost:5000/api/v1/appointments";
+const API_URL = `${
+  import.meta.env.VITE_API_URL || "http://localhost:5000"
+}/api/v1/appointments`;
 
 // Generate appointment time slots in 12-hour AM/PM format.
 // Backend receives time in HH:mm format.
