@@ -21,7 +21,7 @@ function About() {
 
             <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl">
               <img
-                src="/public/doctorimage.jpeg"
+                src="/doctorimage.jpeg"
                 alt="पशुवैद्यकीय डॉक्टर"
                 className="w-full h-[450px] md:h-[550px] object-cover"
               />
