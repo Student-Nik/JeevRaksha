@@ -1,16 +1,23 @@
-require("dotenv").config();
+import dotenv from "dotenv";
 
-const app = require("./app");
-const connectDB = require("./config/db");
+dotenv.config();
+
+const { default: app } = await import("./app.js");
+const { default: connectDB } = await import("./config/db.js");
 
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
-  await connectDB();
+  try {
+    await connectDB();
 
-  app.listen(PORT, () => {
-    console.log(`JeevRaksha server running on port ${PORT}`);
-  });
+    app.listen(PORT, () => {
+      console.log(`JeevRaksha server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Server startup failed:", error.message);
+    process.exit(1);
+  }
 };
 
 startServer();

@@ -1,12 +1,12 @@
 
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD
-  }
+    pass: process.env.EMAIL_APP_PASSWORD,
+  },
 });
 
 // Convert enum values into Marathi
@@ -28,7 +28,7 @@ const formatLabel = (value) => {
     EMERGENCY: "आपत्कालीन सेवा",
     ROUTINE_CHECKUP: "नियमित तपासणी",
     SURGERY: "शस्त्रक्रिया",
-    CONSULTATION: "वैद्यकीय सल्ला"
+    CONSULTATION: "वैद्यकीय सल्ला",
   };
 
   if (translations[value]) {
@@ -38,7 +38,7 @@ const formatLabel = (value) => {
   return value
     .toLowerCase()
     .split("_")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
 
@@ -54,7 +54,7 @@ const formatTime = (time) => {
   return date.toLocaleTimeString("mr-IN", {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true
+    hour12: true,
   });
 };
 
@@ -268,12 +268,10 @@ const sendAppointmentNotification = async (appointment) => {
     from: `"JeevRaksha" <${process.env.EMAIL_USER}>`,
     to: process.env.DOCTOR_EMAIL,
     subject: `नवीन अपॉइंटमेंट विनंती - ${appointment.ownerName}`,
-    html
+    html,
   };
 
   return await transporter.sendMail(mailOptions);
 };
 
-module.exports = {
-  sendAppointmentNotification
-};
+export { sendAppointmentNotification };

@@ -1,9 +1,9 @@
 
-const Visit = require("../models/Visit");
-const generateVisitPdf = require("../services/visitPdfService");
-const sendVisitReportEmail = require("../services/visitEmailService");
+import Visit from "../models/Visit.js";
+import generateVisitPdf from "../services/visitPdfService.js";
+import sendVisitReportEmail from "../services/visitEmailService.js";
 
-const createVisit = async (req, res) => {
+export const createVisit = async (req, res) => {
   try {
     const {
       farmerName,
@@ -148,5 +148,3 @@ const createVisit = async (req, res) => {
     });
   }
 };
-
-module.exports = { createVisit };

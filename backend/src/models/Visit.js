@@ -1,4 +1,9 @@
-const mongoose = require("mongoose");
+
+import mongoose from "mongoose";
+
+// ========================================
+// Medicine Schema
+// ========================================
 
 const medicineSchema = new mongoose.Schema(
   {
@@ -11,6 +16,10 @@ const medicineSchema = new mongoose.Schema(
   },
   { _id: false }
 );
+
+// ========================================
+// Visit Schema
+// ========================================
 
 const visitSchema = new mongoose.Schema(
   {
@@ -110,4 +119,10 @@ const visitSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Visit", visitSchema);
+// ========================================
+// Visit Model
+// ========================================
+
+const Visit = mongoose.model("Visit", visitSchema);
+
+export default Visit;

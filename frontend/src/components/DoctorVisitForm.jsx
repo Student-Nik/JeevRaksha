@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -15,12 +16,7 @@ import {
   FileText,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-
-const API_BASE_URL = (
-  import.meta.env.VITE_API_URL || "http://localhost:5000"
-).replace(/\/+$/, "");
-
-const API_URL = `${API_BASE_URL}/api/v1/visits`;
+import { apiFetch, API_ENDPOINTS } from "../services/api.js";
 
 const initialForm = {
   farmerName: "",
@@ -278,7 +274,8 @@ function DoctorVisitForm() {
         status: selectedStatus,
       };
 
-      const response = await fetch(API_URL, {
+      // Centralized API request
+      const response = await apiFetch(API_ENDPOINTS.VISITS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -289,6 +286,7 @@ function DoctorVisitForm() {
 
       const result = await response.json();
 
+      // Handle expired or invalid authentication
       if (response.status === 401 || response.status === 403) {
         localStorage.removeItem("doctorToken");
         localStorage.removeItem("doctorUsername");

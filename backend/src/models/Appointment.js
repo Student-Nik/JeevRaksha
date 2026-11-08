@@ -1,31 +1,30 @@
-
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const appointmentSchema = new mongoose.Schema(
   {
     ownerName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     phone: {
       type: String,
       required: true,
       trim: true,
-      match: [/^[0-9]{10}$/, "Enter a valid 10-digit phone number"]
+      match: [/^[0-9]{10}$/, "Enter a valid 10-digit phone number"],
     },
 
     animalType: {
       type: String,
       required: true,
-      enum: ["DOG", "CAT", "COW", "BUFFALO", "GOAT", "SHEEP", "OTHER"]
+      enum: ["DOG", "CAT", "COW", "BUFFALO", "GOAT", "SHEEP", "OTHER"],
     },
 
     animalName: {
       type: String,
       trim: true,
-      default: ""
+      default: "",
     },
 
     service: {
@@ -37,46 +36,48 @@ const appointmentSchema = new mongoose.Schema(
         "TREATMENT",
         "LIVESTOCK_CARE",
         "HEALTH_CHECKUP",
-        "OTHER"
-      ]
+        "OTHER",
+      ],
     },
 
     date: {
       type: String,
-      required: true
+      required: true,
     },
 
     time: {
       type: String,
-      required: true
+      required: true,
     },
 
     address: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     message: {
       type: String,
       trim: true,
-      default: ""
+      default: "",
     },
 
     status: {
       type: String,
       enum: ["PENDING", "CONFIRMED", "COMPLETED", "REJECTED", "CANCELLED"],
-      default: "PENDING"
+      default: "PENDING",
     },
 
     notificationSent: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Appointment", appointmentSchema);
+const Appointment = mongoose.model("Appointment", appointmentSchema);
+
+export default Appointment;

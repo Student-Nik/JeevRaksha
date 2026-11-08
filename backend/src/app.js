@@ -1,42 +1,31 @@
-const express = require("express");
-const cors = require("cors");
+import express from "express";
 
-const appointmentRoutes = require("./routes/appointmentRoutes");
-const authRoutes = require("./routes/authRoutes");
-const visitRoutes = require("./routes/visitRoutes");
+import corsMiddleware from "./config/cors.js";
+
+import appointmentRoutes from "./routes/appointmentRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import visitRoutes from "./routes/visitRoutes.js";
 
 const app = express();
 
-// Allowed frontend origins
-const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(",").map((url) => url.trim())
-  : ["http://localhost:5173"];
+// CORS configuration
+app.use(corsMiddleware);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    }
-  })
-);
-
+// Request body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// API health check
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Welcome to JeevRaksha API"
+    message: "Welcome to JeevRaksha API",
   });
 });
 
-// Routes
+// API routes
 app.use("/api/v1/appointments", appointmentRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/visits", visitRoutes);
 
-module.exports = app;
+export default app;

@@ -1,5 +1,13 @@
 
-const nodemailer = require("nodemailer");
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_APP_PASSWORD,
+  },
+});
 
 const escapeHtml = (value) => {
   return String(value || "")
@@ -11,14 +19,6 @@ const escapeHtml = (value) => {
 };
 
 const sendVisitReportEmail = async (visit, pdfBuffer) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_APP_PASSWORD
-    }
-  });
-
   const farmerName = escapeHtml(visit.farmerName);
   const animalName = escapeHtml(visit.animalName || visit.animalType);
   const visitDate = escapeHtml(visit.visitDate);
@@ -27,7 +27,7 @@ const sendVisitReportEmail = async (visit, pdfBuffer) => {
   const mailOptions = {
     from: {
       name: "JeevRaksha",
-      address: process.env.EMAIL_USER
+      address: process.env.EMAIL_USER,
     },
 
     to: visit.email,
@@ -94,9 +94,9 @@ const sendVisitReportEmail = async (visit, pdfBuffer) => {
       {
         filename: `JeevRaksha-Visit-Report-${visit._id}.pdf`,
         content: pdfBuffer,
-        contentType: "application/pdf"
-      }
-    ]
+        contentType: "application/pdf",
+      },
+    ],
   };
 
   const info = await transporter.sendMail(mailOptions);
@@ -106,4 +106,4 @@ const sendVisitReportEmail = async (visit, pdfBuffer) => {
   return info;
 };
 
-module.exports = sendVisitReportEmail;
+export default sendVisitReportEmail;

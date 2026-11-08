@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
   try {
@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         success: false,
-        message: "Authentication required. Please login."
+        message: "Authentication required. Please login.",
       });
     }
 
@@ -18,7 +18,7 @@ const authMiddleware = (req, res, next) => {
     if (decoded.role !== "DOCTOR") {
       return res.status(403).json({
         success: false,
-        message: "Access denied. Doctor access only."
+        message: "Access denied. Doctor access only.",
       });
     }
 
@@ -28,9 +28,9 @@ const authMiddleware = (req, res, next) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired token. Please login again."
+      message: "Invalid or expired token. Please login again.",
     });
   }
 };
 
-module.exports = authMiddleware;
+export default authMiddleware;

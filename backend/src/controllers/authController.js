@@ -1,7 +1,7 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-const doctorLogin = async (req, res) => {
+export const doctorLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -9,7 +9,7 @@ const doctorLogin = async (req, res) => {
     if (!username || !password) {
       return res.status(400).json({
         success: false,
-        message: "Username and password are required."
+        message: "Username and password are required.",
       });
     }
 
@@ -17,7 +17,7 @@ const doctorLogin = async (req, res) => {
     if (username !== process.env.DOCTOR_USERNAME) {
       return res.status(401).json({
         success: false,
-        message: "Invalid username or password."
+        message: "Invalid username or password.",
       });
     }
 
@@ -30,7 +30,7 @@ const doctorLogin = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: "Invalid username or password."
+        message: "Invalid username or password.",
       });
     }
 
@@ -38,11 +38,11 @@ const doctorLogin = async (req, res) => {
     const token = jwt.sign(
       {
         username: process.env.DOCTOR_USERNAME,
-        role: "DOCTOR"
+        role: "DOCTOR",
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN || "1d"
+        expiresIn: process.env.JWT_EXPIRES_IN || "1d",
       }
     );
 
@@ -51,18 +51,15 @@ const doctorLogin = async (req, res) => {
       message: "Login successful!",
       data: {
         token,
-        username: process.env.DOCTOR_USERNAME
-      }
+        username: process.env.DOCTOR_USERNAME,
+      },
     });
-
   } catch (error) {
     console.error("Doctor login error:", error.message);
 
     return res.status(500).json({
       success: false,
-      message: "Something went wrong during login."
+      message: "Something went wrong during login.",
     });
   }
 };
-
-module.exports = { doctorLogin };

@@ -15,11 +15,7 @@ import {
   Activity,
 } from "lucide-react";
 
-const API_BASE_URL = (
-  import.meta.env.VITE_API_URL || "http://localhost:5000"
-).replace(/\/+$/, "");
-
-const API_URL = `${API_BASE_URL}/api/v1/auth/doctor/login`;
+import { apiFetch, API_ENDPOINTS } from "../services/api.js";
 
 function DoctorLogin() {
   const navigate = useNavigate();
@@ -42,7 +38,7 @@ function DoctorLogin() {
     try {
       setLoading(true);
 
-      const response = await fetch(API_URL, {
+      const response = await apiFetch(API_ENDPOINTS.DOCTOR_LOGIN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

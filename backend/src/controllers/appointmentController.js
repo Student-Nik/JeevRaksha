@@ -1,8 +1,8 @@
 
-const Appointment = require("../models/Appointment");
-const { sendAppointmentNotification } = require("../services/emailService");
+import Appointment from "../models/Appointment.js";
+import { sendAppointmentNotification } from "../services/emailService.js";
 
-const createAppointment = async (req, res) => {
+export const createAppointment = async (req, res) => {
   try {
     const {
       ownerName,
@@ -83,8 +83,4 @@ const createAppointment = async (req, res) => {
       message: "Something went wrong while booking the appointment."
     });
   }
-};
-
-module.exports = {
-  createAppointment
 };

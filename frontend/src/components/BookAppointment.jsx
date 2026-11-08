@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,12 +13,7 @@ import {
   User,
 } from "lucide-react";
 
-// Backend API URL
-const API_BASE_URL = (
-  import.meta.env.VITE_API_URL || "http://localhost:5000"
-).replace(/\/+$/, "");
-
-const API_URL = `${API_BASE_URL}/api/v1/appointments`;
+import { apiFetch, API_ENDPOINTS } from "../services/api.js";
 
 // Generate appointment time slots in 12-hour AM/PM format.
 // Backend receives time in HH:mm format.
@@ -88,6 +82,8 @@ function BookAppointment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isLoading) return;
+
     if (!/^[0-9]{10}$/.test(formData.phone)) {
       setErrorMessage("कृपया योग्य १० अंकी मोबाईल नंबर टाका.");
       return;
@@ -98,7 +94,8 @@ function BookAppointment() {
       setIsSubmitted(false);
       setErrorMessage("");
 
-      const response = await fetch(API_URL, {
+      // Centralized API request using Fetch.
+      const response = await apiFetch(API_ENDPOINTS.APPOINTMENTS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -156,11 +153,9 @@ function BookAppointment() {
 
   return (
     <div className="min-h-screen bg-[#0B2B24] text-white">
-
       {/* Header */}
       <header className="border-b border-white/10 bg-[#123D32]">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 md:px-10">
-
           <Link to="/" className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#C7F36B] text-[#123D32]">
               <PawPrint size={25} />
@@ -184,13 +179,11 @@ function BookAppointment() {
             <ArrowLeft size={17} />
             मुख्यपृष्ठावर जा
           </Link>
-
         </div>
       </header>
 
       {/* Page Introduction */}
       <section className="px-5 pb-10 pt-14 text-center md:pt-20">
-
         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#C7F36B] text-[#123D32]">
           <CalendarDays size={32} />
         </div>
@@ -211,19 +204,14 @@ function BookAppointment() {
           आजच अपॉइंटमेंट निश्चित करा. आम्ही प्रत्येक जीवाची
           प्रेमाने आणि आपुलकीने काळजी घेतो.
         </p>
-
       </section>
 
       {/* Booking Content */}
       <section className="mx-auto max-w-7xl px-5 pb-20 md:px-10">
-
         <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-
           {/* Left Information Card */}
           <div className="space-y-6">
-
             <div className="rounded-3xl border border-white/10 bg-[#123D32] p-7 md:p-9">
-
               <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#C7F36B]/10 text-[#C7F36B]">
                 <Heart size={30} />
               </div>
@@ -240,7 +228,6 @@ function BookAppointment() {
               </p>
 
               <div className="space-y-5">
-
                 <div className="flex items-start gap-4">
                   <div className="rounded-xl bg-[#C7F36B]/10 p-3 text-[#C7F36B]">
                     <Stethoscope size={22} />
@@ -288,13 +275,11 @@ function BookAppointment() {
                     </p>
                   </div>
                 </div>
-
               </div>
             </div>
 
             {/* Contact Card */}
             <div className="rounded-3xl border border-[#C7F36B]/20 bg-[#C7F36B]/10 p-7">
-
               <h3 className="mb-3 text-xl font-bold text-[#C7F36B]">
                 काही मदत हवी आहे?
               </h3>
@@ -311,14 +296,11 @@ function BookAppointment() {
                 संपर्क साधा
                 <ArrowUpRight size={18} />
               </Link>
-
             </div>
-
           </div>
 
           {/* Appointment Form */}
           <div className="rounded-3xl border border-white/10 bg-[#123D32] p-6 shadow-2xl shadow-black/20 md:p-10">
-
             <div className="mb-8">
               <p className="mb-2 text-sm font-bold tracking-wider text-[#C7F36B]">
                 BOOK AN APPOINTMENT
@@ -334,7 +316,6 @@ function BookAppointment() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-
               {/* Owner Details */}
               <div>
                 <h4 className="mb-5 flex items-center gap-2 text-lg font-bold text-[#C7F36B]">
@@ -343,7 +324,6 @@ function BookAppointment() {
                 </h4>
 
                 <div className="grid gap-5 md:grid-cols-2">
-
                   <div>
                     <label className={labelClass}>
                       मालकाचे पूर्ण नाव *
@@ -378,7 +358,6 @@ function BookAppointment() {
                       className={inputClass}
                     />
                   </div>
-
                 </div>
               </div>
 
@@ -392,7 +371,6 @@ function BookAppointment() {
                 </h4>
 
                 <div className="grid gap-5 md:grid-cols-2">
-
                   <div>
                     <label className={labelClass}>
                       प्राण्याचा प्रकार *
@@ -430,7 +408,6 @@ function BookAppointment() {
                       className={inputClass}
                     />
                   </div>
-
                 </div>
               </div>
 
@@ -444,7 +421,6 @@ function BookAppointment() {
                 </h4>
 
                 <div className="space-y-5">
-
                   <div>
                     <label className={labelClass}>
                       आवश्यक सेवा *
@@ -468,7 +444,6 @@ function BookAppointment() {
                   </div>
 
                   <div className="grid gap-5 md:grid-cols-2">
-
                     <div>
                       <label className={labelClass}>
                         अपॉइंटमेंटची तारीख *
@@ -509,7 +484,6 @@ function BookAppointment() {
                         ))}
                       </select>
                     </div>
-
                   </div>
 
                   <div>
@@ -542,14 +516,12 @@ function BookAppointment() {
                       className={inputClass}
                     />
                   </div>
-
                 </div>
               </div>
 
               {/* Success Message */}
               {isSubmitted && (
                 <div className="flex items-start gap-3 rounded-xl border border-[#C7F36B]/30 bg-[#C7F36B]/10 p-4 text-[#C7F36B]">
-
                   <CheckCircle
                     size={22}
                     className="mt-0.5 shrink-0"
@@ -597,17 +569,14 @@ function BookAppointment() {
               <p className="text-center text-xs leading-5 text-[#91AA9D]">
                 * चिन्ह असलेली माहिती भरणे आवश्यक आहे.
               </p>
-
             </form>
           </div>
-
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-white/10 bg-[#123D32] px-5 py-7">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
-
           <Link to="/" className="flex items-center gap-2">
             <PawPrint size={22} className="text-[#C7F36B]" />
             <span className="font-bold">JeevRaksha</span>
@@ -623,10 +592,8 @@ function BookAppointment() {
           >
             मुख्यपृष्ठावर जा
           </Link>
-
         </div>
       </footer>
-
     </div>
   );
 }
